@@ -10,6 +10,7 @@ import FashionPreferences from './pages/FashionPreferences'
 import AIRecommendations from './pages/AIRecommendations'
 import VirtualTryOn from './pages/VirtualTryOn'
 import Profile from './pages/Profile'
+import DatasetManager from './pages/DatasetManager'
 
 import Landing from './pages/Landing'
 
@@ -33,6 +34,7 @@ function App() {
             <Route path="/recommendations" element={<AIRecommendations />} />
             <Route path="/tryon" element={<VirtualTryOn />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/dataset" element={<DatasetManager />} />
           </Routes>
         </motion.div>
       </div>

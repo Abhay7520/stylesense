@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Home, Upload, Palette, Sparkles, Camera, User, LogOut } from 'lucide-react'
+import { Home, Upload, Palette, Sparkles, Camera, User, LogOut, Database } from 'lucide-react'
 
 const Sidebar = () => {
   const location = useLocation()
@@ -10,6 +10,7 @@ const Sidebar = () => {
     { icon: Palette, label: 'Preferences', path: '/preferences' },
     { icon: Sparkles, label: 'Recommendations', path: '/recommendations' },
     { icon: Camera, label: 'Try-On', path: '/tryon' },
+    { icon: Database, label: 'Dataset', path: '/dataset' },
     { icon: User, label: 'Profile', path: '/profile' },
   ]
 

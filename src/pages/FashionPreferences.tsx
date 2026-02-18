@@ -3,7 +3,10 @@ import { motion } from 'framer-motion'
 import { Palette, Sparkles, DollarSign, Calendar, ArrowRight } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 
+import { useNavigate } from 'react-router-dom'
+
 const FashionPreferences = () => {
+  const navigate = useNavigate()
   const [preferences, setPreferences] = useState({
     gender: '',
     occasion: '',
@@ -19,10 +22,14 @@ const FashionPreferences = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+
+    // Save to local storage
+    localStorage.setItem('userPreferences', JSON.stringify(preferences))
+
     setTimeout(() => {
       setIsSubmitting(false)
-      alert('Preferences saved! Redirecting to recommendations...')
-    }, 2000)
+      navigate('/recommendations')
+    }, 1500)
   }
 
   const genders = ['Male', 'Female', 'Non-binary', 'Prefer not to say']
@@ -38,7 +45,7 @@ const FashionPreferences = () => {
   ]
 
   const containerVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }
-  const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } } }
+  const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as any } } }
 
   const RadioOption = ({ name, value, label, checked }: { name: string; value: string; label: string; checked: boolean }) => (
     <label style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', border: `1px solid ${checked ? 'rgba(201,169,110,0.5)' : 'rgba(245,240,235,0.07)'}`, background: checked ? 'rgba(201,169,110,0.07)' : 'transparent', cursor: 'pointer', transition: 'border-color 0.2s, background 0.2s' }}

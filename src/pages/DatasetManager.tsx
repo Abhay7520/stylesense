@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Database, Sparkles, Users } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 import Card from '../components/Card'
-import { FashionDatasetGenerator } from '../lib/datasetGenerator'
+import { fetchDataset, generateDataset as apiGenerateDataset } from '../lib/api'
 
 const DatasetManager = () => {
   const [isGenerating, setIsGenerating] = useState(false)
@@ -13,27 +13,46 @@ const DatasetManager = () => {
     totalItems: 0
   })
 
-  const generator = new FashionDatasetGenerator()
+  // Fetch initial stats
+  useEffect(() => {
+    loadDatasetStats()
+  }, [])
+
+  const loadDatasetStats = async () => {
+    try {
+      const data = await fetchDataset()
+      if (data && data.metadata) {
+        setDatasetStats({
+          menOutfits: data.men_outfits ? data.men_outfits.length : 0,
+          womenOutfits: data.women_outfits ? data.women_outfits.length : 0,
+          totalItems: data.metadata.total_outfits || 0
+        })
+      }
+    } catch (err) {
+      console.error("Failed to load dataset stats", err)
+    }
+  }
 
   const generateDataset = async () => {
     setIsGenerating(true)
-    
-    // Simulate dataset generation
-    setTimeout(() => {
-      const dataset = generator.generateFullDataset(100, 100)
-      setDatasetStats({
-        menOutfits: dataset.men_outfits.length,
-        womenOutfits: dataset.women_outfits.length,
-        totalItems: dataset.men_outfits.length + dataset.women_outfits.length
-      })
-      
-      // Export the dataset
-      generator.exportDataset(dataset, 'stylesense_fashion_dataset.json')
-      
+
+    try {
+      // Call backend to generate
+      await apiGenerateDataset(100, 100)
+
+      // Reload stats
+      await loadDatasetStats()
+
+      alert('Dataset generated successfully on the backend!')
+    } catch (error) {
+      console.error("Error generating dataset:", error)
+      alert("Failed to generate dataset. Is the backend running?")
+    } finally {
       setIsGenerating(false)
-      alert('Dataset generated and downloaded successfully!')
-    }, 2000)
+    }
   }
+
+
 
   const datasetStructure = {
     menCategories: ['Casual', 'Business', 'Formal', 'Sports', 'Beach', 'Date Night'],
@@ -50,7 +69,7 @@ const DatasetManager = () => {
   return (
     <div className="flex">
       <Sidebar />
-      
+
       <div className="flex-1 p-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -62,7 +81,7 @@ const DatasetManager = () => {
               Fashion Dataset Manager
             </h1>
             <p className="text-xl text-gray-600">
-              Create and manage AI training datasets for fashion recommendations
+              Manage AI training datasets via FastAPI Backend
             </p>
           </div>
 
@@ -100,7 +119,7 @@ const DatasetManager = () => {
                 <Sparkles className="w-6 h-6 mr-2 text-[#EB4C4C]" />
                 Generate Dataset
               </h2>
-              
+
               <div className="space-y-6">
                 <div className="p-4 bg-gradient-to-r from-[#FFA6A6]/10 to-[#FFEDC7]/10 rounded-2xl">
                   <h3 className="font-semibold text-gray-800 mb-2">Dataset Specifications:</h3>
@@ -119,7 +138,7 @@ const DatasetManager = () => {
                   className="w-full py-4 bg-gradient-to-r from-[#EB4C4C] to-[#FF7070] text-white rounded-full font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                 >
                   <Database className="w-5 h-5" />
-                  <span>{isGenerating ? 'Generating Dataset...' : 'Generate Complete Dataset'}</span>
+                  <span>{isGenerating ? 'Generating on Backend...' : 'Generate New Dataset'}</span>
                 </button>
 
                 {isGenerating && (
@@ -131,13 +150,15 @@ const DatasetManager = () => {
               </div>
             </Card>
 
+
+
             {/* Dataset Structure */}
             <Card className="p-8">
               <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                 <Database className="w-6 h-6 mr-2 text-[#EB4C4C]" />
                 Dataset Structure
               </h2>
-              
+
               <div className="space-y-6">
                 <div>
                   <h3 className="font-semibold text-gray-800 mb-3">Categories:</h3>
@@ -176,7 +197,7 @@ const DatasetManager = () => {
           {/* Data Sources Guide */}
           <Card className="p-8 mt-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Real Dataset Sources</h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <h3 className="font-semibold text-gray-800 mb-3">Free Sources</h3>
@@ -187,7 +208,7 @@ const DatasetManager = () => {
                   <li>• <strong>Open Source:</strong> Polyvore, iMaterialist</li>
                 </ul>
               </div>
-              
+
               <div>
                 <h3 className="font-semibold text-gray-800 mb-3">Paid Sources</h3>
                 <ul className="text-sm text-gray-600 space-y-2">
@@ -197,7 +218,7 @@ const DatasetManager = () => {
                   <li>• <strong>Adobe Stock:</strong> Premium fashion photos</li>
                 </ul>
               </div>
-              
+
               <div>
                 <h3 className="font-semibold text-gray-800 mb-3">Collection Tips</h3>
                 <ul className="text-sm text-gray-600 space-y-2">

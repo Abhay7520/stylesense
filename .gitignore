@@ -23,3 +23,10 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
