@@ -24,6 +24,46 @@ const Landing = () => {
     }
   ]
 
+  // Gallery looks: women (1-3) + men (4-6)
+  const looks = [
+    {
+      id: 1,
+      label: 'Jeans & Top',
+      tag: 'WOMEN',
+      img: 'https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=600&h=800&fit=crop&crop=top',
+    },
+    {
+      id: 2,
+      label: 'Kurti',
+      tag: 'WOMEN',
+      img: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&h=800&fit=crop&crop=top',
+    },
+    {
+      id: 3,
+      label: 'Dress',
+      tag: 'WOMEN',
+      img: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=600&h=800&fit=crop&crop=top',
+    },
+    {
+      id: 4,
+      label: 'Casual Shirt & Jeans',
+      tag: 'MEN',
+      img: 'https://i.pinimg.com/736x/3f/00/96/3f0096f4e231b52a5ec0c0d6d4edd035.jpg',
+    },
+    {
+      id: 5,
+      label: 'Formal Suit',
+      tag: 'MEN',
+      img: 'https://i.pinimg.com/736x/f3/d1/a1/f3d1a1a1fc1166b7500fcf6e022a397b.jpg',
+    },
+    {
+      id: 6,
+      label: 'Kurta',
+      tag: 'MEN',
+      img: 'https://i.pinimg.com/736x/2b/ee/8e/2bee8efbf54d143c261a1f8667a0fe9f.jpg',
+    },
+  ]
+
   const containerVariants = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.15 } }
@@ -153,6 +193,75 @@ const Landing = () => {
           pointer-events: none;
           z-index: 1000;
         }
+
+        /* ── Gallery card ── */
+        .look-card {
+          position: relative;
+          aspect-ratio: 3/4;
+          overflow: hidden;
+          border: 1px solid rgba(245,240,235,0.08);
+          cursor: pointer;
+        }
+        .look-card img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          transition: transform 0.6s cubic-bezier(0.22,1,0.36,1);
+        }
+        .look-card:hover img { transform: scale(1.06); }
+        .look-card-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to top, rgba(10,10,10,0.75) 0%, transparent 55%);
+          transition: background 0.3s;
+        }
+        .look-card:hover .look-card-overlay {
+          background: linear-gradient(to top, rgba(10,10,10,0.85) 0%, rgba(201,169,110,0.06) 100%);
+        }
+        .look-card-meta {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          padding: 20px;
+        }
+        .look-card-tag {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 9px;
+          font-weight: 500;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: #c9a96e;
+          margin-bottom: 6px;
+        }
+        .look-card-label {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 20px;
+          font-weight: 300;
+          color: #f5f0eb;
+          line-height: 1.2;
+        }
+        .look-card-num {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 13px;
+          font-weight: 300;
+          color: rgba(245,240,235,0.35);
+          letter-spacing: 0.08em;
+        }
+        /* Gold border on hover */
+        .look-card::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border: 1px solid transparent;
+          transition: border-color 0.3s;
+          pointer-events: none;
+        }
+        .look-card:hover::after { border-color: rgba(201,169,110,0.45); }
       `}</style>
 
       <div className="noise-overlay" />
@@ -174,7 +283,6 @@ const Landing = () => {
 
       {/* ─── HERO ─── */}
       <section style={{ padding: '80px 60px 120px', position: 'relative' }}>
-        {/* Background accent */}
         <div style={{
           position: 'absolute', top: -100, right: -200,
           width: 700, height: 700,
@@ -188,7 +296,6 @@ const Landing = () => {
           animate="visible"
           style={{ maxWidth: 1200, margin: '0 auto' }}
         >
-          {/* Overline */}
           <motion.div variants={fadeUp} style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 48 }}>
             <div style={{ width: 40, height: 1, background: '#c9a96e' }} />
             <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#c9a96e' }}>
@@ -196,53 +303,18 @@ const Landing = () => {
             </span>
           </motion.div>
 
-          {/* Giant headline */}
           <div style={{ position: 'relative' }}>
-            <motion.h1
-              variants={fadeUp}
-              style={{
-                fontSize: 'clamp(64px, 10vw, 140px)',
-                fontWeight: 300,
-                lineHeight: 0.92,
-                letterSpacing: '-0.02em',
-                margin: 0,
-                marginBottom: 8
-              }}
-            >
+            <motion.h1 variants={fadeUp} style={{ fontSize: 'clamp(64px, 10vw, 140px)', fontWeight: 300, lineHeight: 0.92, letterSpacing: '-0.02em', margin: 0, marginBottom: 8 }}>
               Dress
             </motion.h1>
-            <motion.h1
-              variants={fadeUp}
-              style={{
-                fontSize: 'clamp(64px, 10vw, 140px)',
-                fontWeight: 300,
-                lineHeight: 0.92,
-                letterSpacing: '-0.02em',
-                margin: 0,
-                marginBottom: 8,
-                paddingLeft: '15%',
-                fontStyle: 'italic',
-                color: '#c9a96e'
-              }}
-            >
+            <motion.h1 variants={fadeUp} style={{ fontSize: 'clamp(64px, 10vw, 140px)', fontWeight: 300, lineHeight: 0.92, letterSpacing: '-0.02em', margin: 0, marginBottom: 8, paddingLeft: '15%', fontStyle: 'italic', color: '#c9a96e' }}>
               Smarter,
             </motion.h1>
-            <motion.h1
-              variants={fadeUp}
-              style={{
-                fontSize: 'clamp(64px, 10vw, 140px)',
-                fontWeight: 300,
-                lineHeight: 0.92,
-                letterSpacing: '-0.02em',
-                margin: 0,
-                marginBottom: 60,
-              }}
-            >
+            <motion.h1 variants={fadeUp} style={{ fontSize: 'clamp(64px, 10vw, 140px)', fontWeight: 300, lineHeight: 0.92, letterSpacing: '-0.02em', margin: 0, marginBottom: 60 }}>
               Live Bolder.
             </motion.h1>
           </div>
 
-          {/* Subtext + CTA in 2 cols */}
           <motion.div variants={fadeUp} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'end' }}>
             <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, fontWeight: 300, lineHeight: 1.7, color: 'rgba(245,240,235,0.6)', margin: 0, maxWidth: 420 }}>
               Transform your wardrobe with intelligent fashion recommendations powered by cutting-edge AI technology.
@@ -293,7 +365,6 @@ const Landing = () => {
           </p>
         </motion.div>
 
-        {/* Feature rows */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -341,32 +412,53 @@ const Landing = () => {
           </h2>
         </motion.div>
 
+        {/* ── Women's section label ── */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 28 }}>
+          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10, fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#c9a96e' }}>Women</span>
+          <div style={{ flex: 1, height: 1, background: 'rgba(201,169,110,0.2)' }} />
+        </div>
+
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 24 }}
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginBottom: 48 }}
         >
-          {[1, 2, 3, 4, 5, 6].map((item) => (
-            <motion.div
-              key={item}
-              variants={fadeUp}
-              style={{
-                aspectRatio: '3/4',
-                background: 'rgba(245,240,235,0.03)',
-                border: '1px solid rgba(245,240,235,0.08)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
-                overflow: 'hidden'
-              }}
-            >
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(45deg, transparent, rgba(201,169,110,0.03))' }} />
-              <Sparkles size={32} color="rgba(201,169,110,0.2)" />
-              <div style={{ position: 'absolute', bottom: 20, left: 20, fontFamily: "'DM Sans', sans-serif", fontSize: 12, letterSpacing: '0.2em', color: 'rgba(245,240,235,0.3)' }}>
-                LOOK 0{item}
+          {looks.slice(0, 3).map((look) => (
+            <motion.div key={look.id} variants={fadeUp} className="look-card">
+              <img src={look.img} alt={look.label} loading="lazy" />
+              <div className="look-card-overlay" />
+              <div className="look-card-num">0{look.id}</div>
+              <div className="look-card-meta">
+                <div className="look-card-tag">{look.tag}</div>
+                <div className="look-card-label">{look.label}</div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* ── Men's section label ── */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 28 }}>
+          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10, fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#c9a96e' }}>Men</span>
+          <div style={{ flex: 1, height: 1, background: 'rgba(201,169,110,0.2)' }} />
+        </div>
+
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}
+        >
+          {looks.slice(3).map((look) => (
+            <motion.div key={look.id} variants={fadeUp} className="look-card">
+              <img src={look.img} alt={look.label} loading="lazy" />
+              <div className="look-card-overlay" />
+              <div className="look-card-num">0{look.id}</div>
+              <div className="look-card-meta">
+                <div className="look-card-tag">{look.tag}</div>
+                <div className="look-card-label">{look.label}</div>
               </div>
             </motion.div>
           ))}
@@ -434,13 +526,11 @@ const Landing = () => {
           viewport={{ once: true }}
           style={{ maxWidth: 1200, margin: '0 auto', position: 'relative' }}
         >
-          {/* Big decorative text */}
           <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: 'clamp(100px, 18vw, 260px)', fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, color: 'rgba(201,169,110,0.04)', whiteSpace: 'nowrap', pointerEvents: 'none', userSelect: 'none', lineHeight: 1 }}>
             STYLE
           </div>
 
           <div style={{ border: '1px solid rgba(245,240,235,0.1)', padding: '100px 80px', textAlign: 'center', position: 'relative', background: 'linear-gradient(135deg, rgba(201,169,110,0.03), transparent)' }}>
-            {/* Corner accents */}
             <div style={{ position: 'absolute', top: -1, left: -1, width: 40, height: 40, borderTop: '2px solid #c9a96e', borderLeft: '2px solid #c9a96e' }} />
             <div style={{ position: 'absolute', top: -1, right: -1, width: 40, height: 40, borderTop: '2px solid #c9a96e', borderRight: '2px solid #c9a96e' }} />
             <div style={{ position: 'absolute', bottom: -1, left: -1, width: 40, height: 40, borderBottom: '2px solid #c9a96e', borderLeft: '2px solid #c9a96e' }} />

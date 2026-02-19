@@ -1,8 +1,11 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Home, Upload, Palette, Sparkles, Camera, User, LogOut, Database } from 'lucide-react'
+import { Home, Upload, Palette, Sparkles, Camera, User, LogOut } from 'lucide-react'
+import { useApp } from '../context/AppContext'
 
 const Sidebar = () => {
   const location = useLocation()
+  const { state, signOut } = useApp()
+  const { user } = state
 
   const menuItems = [
     { icon: Home, label: 'Dashboard', path: '/dashboard' },
@@ -10,7 +13,6 @@ const Sidebar = () => {
     { icon: Palette, label: 'Preferences', path: '/preferences' },
     { icon: Sparkles, label: 'Recommendations', path: '/recommendations' },
     { icon: Camera, label: 'Try-On', path: '/tryon' },
-    { icon: Database, label: 'Dataset', path: '/dataset' },
     { icon: User, label: 'Profile', path: '/profile' },
   ]
 
@@ -172,11 +174,19 @@ const Sidebar = () => {
         </nav>
 
         {/* Footer */}
-        <div className="sidebar-footer">
-          <Link to="/" className="logout-link">
+        <div style={{ marginTop: 'auto', borderTop: '1px solid rgba(245,240,235,0.06)', padding: '24px 28px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+            <img src={user?.profileImage || 'https://via.placeholder.com/40'} alt="Profile" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} />
+            <div style={{ overflow: 'hidden' }}>
+              <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 14, color: '#f5f0eb', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.name || 'User'}</div>
+              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10, color: 'rgba(245,240,235,0.3)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email || 'user@example.com'}</div>
+            </div>
+          </div>
+
+          <div onClick={() => signOut()} className="logout-link" style={{ padding: 0, cursor: 'pointer' }}>
             <LogOut size={14} />
             <span className="nav-label">Logout</span>
-          </Link>
+          </div>
         </div>
       </div>
     </>

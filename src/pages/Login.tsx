@@ -1,17 +1,52 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, Sparkles, ArrowRight } from 'lucide-react'
+import { Eye, EyeOff, Sparkles, ArrowRight, Loader2 } from 'lucide-react'
+import { supabase } from '@/integrations/supabase/client'
+import { toast } from 'sonner'
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({ email: '', password: '' })
   const navigate = useNavigate()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Login: checking session', session)
+      if (session) {
+        console.log('Login: session found, redirecting to dashboard')
+        navigate('/dashboard')
+      }
+    })
+  }, [navigate])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Login:', formData)
-    navigate('/dashboard')
+    setLoading(true)
+    console.log('Login: attempting login for', formData.email)
+
+    try {
+      const { error, data } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      })
+
+      console.log('Login: signIn result', { error, data })
+
+      if (error) {
+        toast.error(error.message)
+      } else {
+        toast.success('Welcome back!')
+        console.log('Login: success, navigating to dashboard')
+        navigate('/dashboard')
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred')
+      console.error('Login: unexpected error', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,6 +108,7 @@ const Login = () => {
           transition: background 0.25s;
         }
         .btn-submit:hover { background: #c9a96e; }
+        .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
 
         .checkbox-custom {
           width: 16px;
@@ -240,8 +276,8 @@ const Login = () => {
             </div>
 
             {/* Submit */}
-            <button type="submit" className="btn-submit">
-              Sign In <ArrowRight size={15} />
+            <button type="submit" className="btn-submit" disabled={loading}>
+              {loading ? <Loader2 size={16} className="animate-spin" /> : <>Sign In <ArrowRight size={15} /></>}
             </button>
           </form>
 

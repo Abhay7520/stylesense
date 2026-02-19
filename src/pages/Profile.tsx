@@ -1,25 +1,36 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { User, Mail, Calendar, Heart, Camera, Edit, Check } from 'lucide-react'
+import { User, Mail, Calendar, Edit, Check } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
+import { useApp } from '../context/AppContext'
 
 const Profile = () => {
+  const { state, updateUser } = useApp()
+  const { user, stats: userStats, savedOutfits: contextSavedOutfits } = state
+
   const [isEditing, setIsEditing] = useState(false)
   const [profileData, setProfileData] = useState({
-    name: 'Sarah Johnson',
-    email: 'sarah.johnson@email.com',
+    name: user.name,
+    email: user.email,
     joinDate: 'January 2024',
     bio: 'Fashion enthusiast looking for stylish and comfortable outfits for everyday wear.'
   })
 
-  const savedOutfits = [
-    { id: 1, name: 'Summer Breeze', date: 'Jan 15', image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=300&h=300&fit=crop' },
-    { id: 2, name: 'Urban Chic', date: 'Jan 12', image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=300&h=300&fit=crop' },
-    { id: 3, name: 'Elegant Evening', date: 'Jan 10', image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=300&h=300&fit=crop' },
-    { id: 4, name: 'Professional Power', date: 'Jan 8', image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=300&h=300&fit=crop' },
-    { id: 5, name: 'Casual Friday', date: 'Jan 5', image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=300&h=300&fit=crop' },
-    { id: 6, name: 'Weekend Brunch', date: 'Jan 3', image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=300&h=300&fit=crop' }
-  ]
+  // Sync with context if it changes (e.g. initial load)
+  useEffect(() => {
+    setProfileData(prev => ({
+      ...prev,
+      name: user.name,
+      email: user.email
+    }))
+  }, [user])
+
+  const savedOutfits = contextSavedOutfits.map(o => ({
+    id: o.id,
+    name: o.name,
+    date: 'Just now', // In real app, store date
+    image: o.image
+  }))
 
   const uploadedImages = [
     { id: 1, date: 'Jan 15', image: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=300&h=300&fit=crop' },
@@ -29,19 +40,23 @@ const Profile = () => {
   ]
 
   const stats = [
-    { label: 'Outfits Tried', value: '24' },
-    { label: 'Saved Looks', value: '18' },
-    { label: 'Photos Uploaded', value: '12' },
-    { label: 'Style Score', value: '92%' },
+    { label: 'Outfits Tried', value: userStats.outfitsTried.toString() },
+    { label: 'Saved Looks', value: userStats.savedLooks.toString() },
+    { label: 'Photos Uploaded', value: userStats.imagesUploaded.toString() },
+    { label: 'Style Score', value: `${user.styleScore}%` },
   ]
 
-  const handleSave = () => setIsEditing(false)
+  const handleSave = () => {
+    updateUser({ name: profileData.name, email: profileData.email })
+    setIsEditing(false)
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setProfileData({ ...profileData, [e.target.name]: e.target.value })
   }
 
   const containerVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.09 } } }
-  const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } } }
+  const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as any } } }
 
   return (
     <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", display: 'flex', minHeight: '100vh', background: '#0a0a0a', color: '#f5f0eb' }}>
@@ -203,9 +218,16 @@ const Profile = () => {
               <motion.div variants={fadeUp} className="panel" style={{ textAlign: 'center' }}>
                 {/* Avatar */}
                 <div style={{ position: 'relative', width: 80, height: 80, margin: '0 auto 24px' }}>
-                  <div style={{ width: 80, height: 80, border: '1px solid rgba(201,169,110,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(201,169,110,0.06)' }}>
-                    <User size={32} color="rgba(201,169,110,0.6)" />
-                  </div>
+                  <img
+                    src={user.profileImage || 'https://via.placeholder.com/80'}
+                    alt="Profile"
+                    style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: user.profileImage ? '50%' : 0 }}
+                  />
+                  {!user.profileImage && (
+                    <div style={{ position: 'absolute', inset: 0, border: '1px solid rgba(201,169,110,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(201,169,110,0.06)' }}>
+                      <User size={32} color="rgba(201,169,110,0.6)" />
+                    </div>
+                  )}
                   {/* Corner accents */}
                   <div style={{ position: 'absolute', top: -4, left: -4, width: 12, height: 12, borderTop: '1px solid #c9a96e', borderLeft: '1px solid #c9a96e' }} />
                   <div style={{ position: 'absolute', bottom: -4, right: -4, width: 12, height: 12, borderBottom: '1px solid #c9a96e', borderRight: '1px solid #c9a96e' }} />
@@ -290,23 +312,28 @@ const Profile = () => {
                 </h2>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-                  {savedOutfits.map((outfit, i) => (
-                    <motion.div
-                      key={outfit.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05, duration: 0.4 }}
-                      className="outfit-thumb"
-                    >
-                      <img src={outfit.image} alt={outfit.name} />
-                      <div className="outfit-thumb-overlay" />
-                      <div className="outfit-thumb-label">
-                        <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 14, fontWeight: 400, marginBottom: 2 }}>{outfit.name}</div>
-                        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10, color: 'rgba(245,240,235,0.5)', letterSpacing: '0.08em' }}>{outfit.date}</div>
-                      </div>
-                      {/* Thin gold border on hover via outline trick */}
-                    </motion.div>
-                  ))}
+                  {savedOutfits.length > 0 ? (
+                    savedOutfits.map((outfit: any, i: number) => (
+                      <motion.div
+                        key={outfit.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05, duration: 0.4 }}
+                        className="outfit-thumb"
+                      >
+                        <img src={outfit.image} alt={outfit.name} />
+                        <div className="outfit-thumb-overlay" />
+                        <div className="outfit-thumb-label">
+                          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 14, fontWeight: 400, marginBottom: 2 }}>{outfit.name}</div>
+                          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10, color: 'rgba(245,240,235,0.5)', letterSpacing: '0.08em' }}>{outfit.date}</div>
+                        </div>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <div style={{ gridColumn: 'span 3', padding: '20px', textAlign: 'center', color: 'rgba(245,240,235,0.3)', border: '1px dashed rgba(245,240,235,0.1)' }}>
+                      No saved outfits.
+                    </div>
+                  )}
                 </div>
               </motion.div>
 

@@ -1,17 +1,51 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, Sparkles, ArrowRight } from 'lucide-react'
+import { Eye, EyeOff, Sparkles, ArrowRight, Loader2 } from 'lucide-react'
+import { supabase } from '@/integrations/supabase/client'
+import { toast } from 'sonner'
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', password: '' })
   const navigate = useNavigate()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate('/dashboard')
+      }
+    })
+  }, [navigate])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Signup:', formData)
-    navigate('/dashboard')
+    setLoading(true)
+
+    try {
+      const { error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.name,
+          },
+        },
+      })
+
+      if (error) {
+        toast.error(error.message)
+      } else {
+        toast.success('Account created! Please sign in.')
+        navigate('/login')
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred')
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,6 +112,7 @@ const Signup = () => {
           transition: background 0.25s;
         }
         .btn-submit:hover { background: #c9a96e; }
+        .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
 
         .checkbox-custom {
           width: 16px;
@@ -273,8 +308,8 @@ const Signup = () => {
             </div>
 
             {/* Submit */}
-            <button type="submit" className="btn-submit">
-              Create Account <ArrowRight size={15} />
+            <button type="submit" className="btn-submit" disabled={loading}>
+              {loading ? <Loader2 size={16} className="animate-spin" /> : <>Create Account <ArrowRight size={15} /></>}
             </button>
           </form>
 
